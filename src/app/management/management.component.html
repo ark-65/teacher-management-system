@@ -4,29 +4,33 @@
       LXCNB
     </div>
     <ul nz-menu nzTheme="dark" nzMode="inline">
-      <li nz-menu-item>
+      <li routerLink="department" nzSelected nz-menu-item>
         <i nz-icon nzType="user" nzTheme="outline"></i>
-        <span>学生管理</span>
+        <span>部门管理</span>
       </li>
-      <li nz-menu-item>
+      <li routerLink="job-title" nz-menu-item>
         <i nz-icon nzType="group" nzTheme="outline"></i>
-        <span>班级管理</span>
+        <span>职称管理</span>
       </li>
-      <li nz-menu-item>
+      <li routerLink="job" nz-menu-item>
         <i nz-icon nzType="container" nzTheme="outline"></i>
-        <span>课程信息管理</span>
+        <span>职务管理</span>
       </li>
-      <li nz-menu-item>
+      <li routerLink="teacher-info" nz-menu-item>
         <i nz-icon nzType="database" nzTheme="outline"></i>
-        <span>上课信息管理</span>
+        <span>教师信息管理</span>
       </li>
-      <li nz-menu-item>
+      <li routerLink="family" nz-menu-item>
         <i nz-icon nzType="read" nzTheme="outline"></i>
-        <span>学生成绩管理</span>
+        <span>教师家庭关系管理</span>
       </li>
-      <li nz-menu-item>
+      <li routerLink="edu-experience" nz-menu-item>
         <i nz-icon nzType="audit" nzTheme="outline"></i>
-        <span>学生奖惩管理</span>
+        <span>教师教育经历管理</span>
+      </li>
+      <li routerLink="rap-record" nz-menu-item>
+        <i nz-icon nzType="audit" nzTheme="outline"></i>
+        <span>教师奖惩管理</span>
       </li>
       <li nz-menu-item>
         <i nz-icon nzType="api" nzTheme="outline"></i>
@@ -37,13 +41,11 @@
   <nz-layout>
     <nz-header></nz-header>
     <nz-content>
-      <nz-breadcrumb>
-        <nz-breadcrumb-item>学生管理</nz-breadcrumb-item>
-      </nz-breadcrumb>
+      <nz-breadcrumb [nzAutoGenerate]="true" [nzRouteLabel]="'breadcrumb'"></nz-breadcrumb>
       <div class="inner-content">
         <router-outlet></router-outlet>
       </div>
     </nz-content>
-    <nz-footer>高校学生管理系统 ©2020 Implement By Angular</nz-footer>
+    <nz-footer>高校教师管理系统 ©2020 Implement By Angular</nz-footer>
   </nz-layout>
 </nz-layout>
