@@ -1,1 +1,47 @@
-<p>department works!</p>
+<div nz-row>
+
+</div>
+<div nz-row>
+  <nz-table #departmentTable
+            [nzFrontPagination]="false"
+            [nzTotal]="pageInfo.totalElements"
+            [nzPageSize]="pageInfo.size"
+            [nzPageSizeOptions]="[5,10,15]"
+            (nzPageIndexChange)="pageIndexChange($event)"
+            (nzPageSizeChange)="pageSizeChange($event)"
+            [nzData]="departmentListOfData"
+  >
+    <thead>
+<!--    <th>id</th>-->
+    <th>部门名称</th>
+    <th>部门人数</th>
+    <th>操作</th>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of departmentTable.data">
+      <ng-container *ngIf="!editCache[data.id].edit; else editTemplate">
+        <td>
+          {{data.departmentName}}
+        </td>
+        <td>
+          {{data.num}}
+        </td>
+        <td>
+          <a class="actionBtn" (click)="startEdit(data.id)">编辑</a>
+          <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.departmentName}}吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
+        </td>
+      </ng-container>
+      <ng-template #editTemplate>
+        <td><input type="text" nz-input [(ngModel)]="editCache[data.id].data.departmentName"/></td>
+        <td><input type="text" nz-input disabled [(ngModel)]="editCache[data.id].data.num"/></td>
+        <td>
+          <a (click)="saveEdit(data.id)" class="save">保存</a>
+          <a nz-popconfirm nzTitle="确定取消吗" (nzOnConfirm)="cancelEdit(data.id)">取消</a>
+        </td>
+      </ng-template>
+    </tr>
+    </tbody>
+
+
+  </nz-table>
+</div>
