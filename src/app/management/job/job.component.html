@@ -1,0 +1,61 @@
+<div nz-row>
+  <button nz-button nzType="default" (click)="showAddModal()">
+    <i nz-icon nzType="plus" nzTheme="outline"></i>添加职务
+  </button>
+</div>
+<div class="table-row" nz-row>
+  <nz-table #jobTable
+            [nzFrontPagination]="false"
+            [nzTotal]="pageInfo.totalElements"
+            [nzPageSize]="pageInfo.size"
+            [nzPageSizeOptions]="[5,10,15]"
+            [nzShowSizeChanger]="true"
+            (nzPageIndexChange)="pageIndexChange($event)"
+            (nzPageSizeChange)="pageSizeChange($event)"
+            [nzData]="jobListOfData"
+  >
+    <thead *ngIf="pageInfo.totalElements !== 0">
+    <!--    <th>id</th>-->
+    <th>职务名称</th>
+    <th>职务人数</th>
+    <th>操作</th>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of jobTable.data">
+      <ng-container *ngIf="!editCache[data.id].edit; else editTemplate">
+        <td>
+          {{data.jobName}}
+        </td>
+        <td>
+          {{data.num}}
+        </td>
+        <td>
+          <a class="actionBtn" (click)="startEdit(data.id)">编辑</a>
+          <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.jobName}}职务吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
+        </td>
+      </ng-container>
+      <ng-template #editTemplate>
+        <td><input type="text" nz-input [(ngModel)]="editCache[data.id].data.jobName"/></td>
+        <td><input type="text" nz-input disabled [(ngModel)]="editCache[data.id].data.num"/></td>
+        <td>
+          <a (click)="saveEdit(data.id)" class="save">保存</a>
+          <a nz-popconfirm nzTitle="确定取消吗" (nzOnConfirm)="cancelEdit(data.id)">取消</a>
+        </td>
+      </ng-template>
+    </tr>
+    </tbody>
+  </nz-table>
+  <!--  添加弹框-->
+  <nz-modal [(nzVisible)]="isAddModelShow" nzTitle="添加职务" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isLoading">
+    <div nz-row nzJustify="space-around">
+      <!--      <form class="add-form" nz-form>-->
+      <nz-form-item class="add-form">
+        <nz-form-label [nzSpan]="6">职务名称</nz-form-label>
+        <nz-form-control [nzValidateStatus]="formStatus.type" [nzSpan]="12" [nzErrorTip]="formStatus.errorMsg">
+          <input type="text" nz-input placeholder="请输入职务名称" [(ngModel)]="jobFormData.jobName">
+        </nz-form-control>
+      </nz-form-item>
+      <!--      </form>-->
+    </div>
+  </nz-modal>
+</div>

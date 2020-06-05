@@ -1,0 +1,51 @@
+<nz-layout>
+  <nz-sider nzCollapsible nzWidth="200px">
+    <div class="logo">
+      LXCNB
+    </div>
+    <ul nz-menu nzTheme="dark" nzMode="inline">
+      <li routerLink="department" nzSelected nz-menu-item>
+        <i nz-icon nzType="user" nzTheme="outline"></i>
+        <span>部门管理</span>
+      </li>
+      <li routerLink="job-title" nz-menu-item>
+        <i nz-icon nzType="group" nzTheme="outline"></i>
+        <span>职称管理</span>
+      </li>
+      <li routerLink="job" nz-menu-item>
+        <i nz-icon nzType="container" nzTheme="outline"></i>
+        <span>职务管理</span>
+      </li>
+      <li routerLink="teacher-info" nz-menu-item>
+        <i nz-icon nzType="database" nzTheme="outline"></i>
+        <span>教师信息管理</span>
+      </li>
+      <li routerLink="family" nz-menu-item>
+        <i nz-icon nzType="read" nzTheme="outline"></i>
+        <span>教师家庭关系管理</span>
+      </li>
+      <li routerLink="edu-experience" nz-menu-item>
+        <i nz-icon nzType="audit" nzTheme="outline"></i>
+        <span>教师教育经历管理</span>
+      </li>
+      <li routerLink="rap-record" nz-menu-item>
+        <i nz-icon nzType="audit" nzTheme="outline"></i>
+        <span>教师奖惩管理</span>
+      </li>
+      <li nz-menu-item>
+        <i nz-icon nzType="api" nzTheme="outline"></i>
+        <span>退出</span>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header></nz-header>
+    <nz-content>
+      <nz-breadcrumb [nzAutoGenerate]="true" [nzRouteLabel]="'breadcrumb'"></nz-breadcrumb>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+    <nz-footer>高校教师管理系统 ©2020 Implement By Angular</nz-footer>
+  </nz-layout>
+</nz-layout>

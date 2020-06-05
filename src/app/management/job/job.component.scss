@@ -1,0 +1,18 @@
+nz-table {
+  width: 100%;
+}
+th {
+  padding: 1px 16px;
+}
+.save {
+  margin-right: 8px;
+}
+a.actionBtn{
+  & + a {
+    margin-left: 8px;
+    color: #c94a4a;
+  }
+}
+.add-form {
+  width: 100%;
+}
