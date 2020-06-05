@@ -1,4 +1,3 @@
-import {DepartmentItem} from './departmentItem';
 
 export interface PageDataVo {
   code: number;
@@ -9,7 +8,7 @@ export interface PageDataVo {
     first: boolean;
     last: boolean;
     number: number;
-    numberOfElement: number;
+    numberOfElements: number;
     pageable: object;
     size: number;
     sort: object;

@@ -1,8 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ManagementService} from '../management.service';
 import {Page} from '../../interface/page';
-import {DepartmentItem} from '../../interface/departmentItem';
 import {NzMessageService, NzNotificationService} from 'ng-zorro-antd';
+import {Department} from '../../interface/vo/department';
+import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+
 
 @Component({
   selector: 'app-department',
@@ -18,12 +20,21 @@ export class DepartmentComponent implements OnInit {
     size: 10,
     number: 0,
     totalElements: 0,
-    totalPages: 0
+    totalPages: 0,
+    numberOfElements: 0
   };
-  editCache: { [key: string]: { edit: boolean; data: DepartmentItem } } = {};
+  editCache: { [key: string]: { edit: boolean; data: Department } } = {};
 
-  departmentListOfData: DepartmentItem[] = [];
-
+  departmentListOfData: Department[] = [];
+  isAddModelShow = false;
+  isLoading = false;
+  departmentFormData: Department = {
+    departmentName: ''
+  };
+  formStatus = {
+    type: 'default',
+    errorMsg: ''
+  };
   ngOnInit(): void {
     this.getData(this.pageInfo);
 
@@ -38,6 +49,7 @@ export class DepartmentComponent implements OnInit {
         this.pageInfo.totalElements = data.totalElements;
         this.pageInfo.totalPages = data.totalPages;
         this.departmentListOfData = data.content;
+        this.pageInfo.numberOfElements = data.numberOfElements;
         console.log(this.pageInfo);
         this.updateEditCache();
       }
@@ -112,6 +124,12 @@ export class DepartmentComponent implements OnInit {
           }
         });
         this.departmentListOfData = newDepartmentList;
+        // 如果当前页删除的是最后一条数据,返回上一页
+        if (this.pageInfo.numberOfElements === 1) {
+          this.pageIndexChange(this.pageInfo.number - 1);
+        } else {
+          this.getData(this.pageInfo);
+        }
         this.message.info('删除成功!');
       } else {
         this.notification.create(
@@ -121,6 +139,45 @@ export class DepartmentComponent implements OnInit {
         );
       }
     });
+  }
+  // 添加弹框
+  showAddModal() {
+    this.isAddModelShow = true;
+  }
+  // 提交数据
+  handleOk() {
+    if (this.departmentFormData.departmentName === '') {
+      this.formStatus.type = 'error';
+      this.formStatus.errorMsg = '部门名称不能为空';
+      return;
+    }
+    this.isLoading = true;
+    this.manageService.addDepartment(this.departmentFormData).subscribe(res => {
+      if (res.code === 0) {
+        this.notification.create(
+          'success',
+          '成功',
+          '添加成功'
+        );
+        this.isAddModelShow = false;
+        this.departmentFormData.departmentName = '';
+        this.getData(this.pageInfo);
+        this.formStatus.type = 'default';
+      } else {
+        this.formStatus.type = 'error';
+        this.formStatus.errorMsg = res.msg;
+      }
+      this.isLoading = false;
+    });
+    // setTimeout(() => {
+    //   this.isLoading = false;
+    //   this.isAddModelShow = false;
+    // }, 1000);
+  }
+
+  handleCancel() {
+    this.isAddModelShow = false;
+    this.formStatus.type = 'default';
   }
 
 }

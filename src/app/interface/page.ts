@@ -3,4 +3,5 @@ export interface Page {
   totalElements?: number;
   totalPages?: number;
   number?: number;
+  numberOfElements?: number;
 }
