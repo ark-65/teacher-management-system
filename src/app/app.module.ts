@@ -20,22 +20,28 @@ import { TeacherInfoComponent } from './management/teacher-info/teacher-info.com
 import { TeacherFamilyInfoComponent } from './management/teacher-family-info/teacher-family-info.component';
 import { EduExperienceInfoComponent } from './management/edu-experience-info/edu-experience-info.component';
 import { RapRecordComponent } from './management/rap-record/rap-record.component';
+import {DepartmentNamePipe} from './pipes/department-name.pipe';
+import {JobTitleNamePipe} from './pipes/job-title-name.pipe';
+import {JobNamePipe} from './pipes/job-name.pipe';
 
 registerLocaleData(zh);
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    ManagementComponent,
-    DepartmentComponent,
-    JobTitleComponent,
-    JobComponent,
-    TeacherInfoComponent,
-    TeacherFamilyInfoComponent,
-    EduExperienceInfoComponent,
-    RapRecordComponent
-  ],
+    declarations: [
+        AppComponent,
+        LoginComponent,
+        ManagementComponent,
+        DepartmentComponent,
+        JobTitleComponent,
+        JobComponent,
+        TeacherInfoComponent,
+        TeacherFamilyInfoComponent,
+        EduExperienceInfoComponent,
+        RapRecordComponent,
+        DepartmentNamePipe,
+        JobTitleNamePipe,
+        JobNamePipe
+    ],
     imports: [
         BrowserModule,
         AppRoutingModule,

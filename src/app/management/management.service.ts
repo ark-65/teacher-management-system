@@ -11,6 +11,7 @@ import {TeacherInfo} from '../interface/vo/teacherInfo';
 import {RapRecord} from '../interface/vo/rapRecord';
 import {EduExperienceInfo} from '../interface/vo/eduExperienceInfo';
 import {TeacherFamilyMember} from '../interface/vo/teacherFamilyMember';
+import {TeacherPageVo} from '../interface/vo/teacherPageVo';
 
 @Injectable({
   providedIn: 'root'
@@ -89,10 +90,10 @@ export class ManagementService {
   updateTeacherInfo(teacherInfo: TeacherInfo): Observable<DataVo> {
     return this.http.patch<DataVo>(`${this.api}/teacher-info`, teacherInfo);
   }
-  getTeacherInfo(page: Page): Observable<PageDataVo> {
+  getTeacherInfo(page: Page): Observable<TeacherPageVo> {
     const pageNumber = page.number;
     const pageSize = page.size;
-    return this.http.get<PageDataVo>(`${this.api}/teacher-info?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
+    return this.http.get<TeacherPageVo>(`${this.api}/teacher-info?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
   }
 
   /**
