@@ -6,12 +6,8 @@ export class JobTitleNamePipe implements PipeTransform {
   transform(value: number, jobTitleList: JobTitle[]): string {
     let jobTitleName: string;
     if (value !== null) {
-      for (const item of jobTitleList) {
-        if (value === item.id) {
-          jobTitleName = item.jobTitleName;
-          break;
-        }
-      }
+      const index = jobTitleList.findIndex(item => item.id === value);
+      jobTitleName = jobTitleList[index].jobTitleName;
     } else {
       jobTitleName = '暂无职称';
     }

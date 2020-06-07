@@ -27,7 +27,6 @@ export class TeacherInfoComponent implements OnInit {
     totalPages: 0,
     numberOfElements: 0
   };
-
   teacherInfoListOfData: TeacherInfo[] = [];
   isLoading = false;
   // 教师信息,用于保存和编辑
@@ -36,9 +35,10 @@ export class TeacherInfoComponent implements OnInit {
     deptId: null,
     jobId: null,
     jobTitleId: null,
-    eMail: '',
+    email: '',
     contact: ''
   };
+  teacherEdit = false;
   formStatus = {
     type: 'default',
     errorMsg: ''
@@ -50,7 +50,7 @@ export class TeacherInfoComponent implements OnInit {
   // 全部职务
   jobList: Job[];
   // 添加弹框
-  isShowAddModel = true;
+  isShowAddModel = false;
   ngOnInit(): void {
     this.getData(this.pageInfo);
 
@@ -70,9 +70,11 @@ export class TeacherInfoComponent implements OnInit {
         this.departmentList = res.data.department;
         this.jobTitleList = res.data.jobTitle;
         this.jobList = res.data.job;
-        this.teacherInfoFormData.deptId = this.departmentList[0].id;
-        this.teacherInfoFormData.jobTitleId = this.jobTitleList[0].id;
-        this.teacherInfoFormData.jobId = this.jobList[0].id;
+        this.teacherInfoFormData = {
+          deptId: this.departmentList[0].id,
+          jobTitleId: this.jobTitleList[0].id,
+          jobId: this.jobList[0].id
+        };
       }
     });
   }
@@ -121,7 +123,7 @@ export class TeacherInfoComponent implements OnInit {
   showAddModal() {
     this.isShowAddModel = true;
   }
-  // 提交数据
+  // 确认提交
   handleOk() {
     // 邮箱正则
     const emailReg = /^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/;
@@ -159,14 +161,14 @@ export class TeacherInfoComponent implements OnInit {
       );
       return;
     }
-    if (this.teacherInfoFormData.eMail === '') {
+    if (this.teacherInfoFormData.email === '') {
       this.notification.create(
         'error',
         '添加失败',
         '电子邮箱不能为空'
       );
       return;
-    } else if (!emailReg.test(this.teacherInfoFormData.eMail)) {
+    } else if (!emailReg.test(this.teacherInfoFormData.email)) {
       this.notification.create(
         'error',
         '添加失败',
@@ -190,7 +192,16 @@ export class TeacherInfoComponent implements OnInit {
       return;
     }
     this.isLoading = true;
+    this.teacherEdit = false;
+    if (this.teacherEdit) {
+      this.updateTeacher();
+    } else {
+      this.addTeacher();
+    }
+  }
+  addTeacher() {
     this.manageService.addTeacherInfo(this.teacherInfoFormData).subscribe(res => {
+      this.isLoading = false;
       if (res.code === 0) {
         this.notification.create(
           'success',
@@ -199,11 +210,11 @@ export class TeacherInfoComponent implements OnInit {
         );
         this.isShowAddModel = false;
         this.teacherInfoFormData = {
-          deptId: null,
-          jobTitleId: null,
+          deptId: this.departmentList[0].id,
+          jobTitleId: this.jobTitleList[0].id,
+          jobId: this.jobList[0].id,
           teacherName: '',
-          jobId: null,
-          eMail: '',
+          email: '',
           contact: ''
         };
         this.getData(this.pageInfo);
@@ -215,25 +226,46 @@ export class TeacherInfoComponent implements OnInit {
         );
       }
     });
-    // this.manageService.addTeacherInfo(this.teacherInfoFormData).subscribe(res => {
-    //   if (res.code === 0) {
-    //     this.notification.create(
-    //       'success',
-    //       '成功',
-    //       '添加成功'
-    //     );
-    //     this.isShowAddModel = false;
-    //     this.teacherInfoFormData.teacherName = '';
-    //     this.getData(this.pageInfo);
-    //     this.formStatus.type = 'default';
-    //   } else {
-    //     this.formStatus.type = 'error';
-    //     this.formStatus.errorMsg = res.msg;
-    //   }
-    //   this.isLoading = false;
-    // });
   }
 
+  updateTeacher() {
+    this.manageService.updateTeacherInfo(this.teacherInfoFormData).subscribe(res => {
+      this.isLoading = false;
+      if (res.code === 0) {
+        this.notification.create(
+          'success',
+          '成功',
+          '修改成功'
+        );
+        this.isShowAddModel = false;
+        this.teacherInfoFormData = {
+          deptId: this.departmentList[0].id,
+          jobTitleId: this.jobTitleList[0].id,
+          jobId: this.jobList[0].id,
+          teacherName: '',
+          email: '',
+          contact: ''
+        };
+        this.getData(this.pageInfo);
+      } else {
+        this.notification.create(
+          'error',
+          '修改失败',
+          res.msg
+        );
+      }
+    });
+  }
+  editTeacher(id: number) {
+    this.teacherEdit = true;
+    const index = this.teacherInfoListOfData.findIndex(item => item.id === id);
+    console.log(index);
+    console.log(this.teacherInfoListOfData[index]);
+    // 取消双向数据绑定
+    const str = JSON.stringify(this.teacherInfoListOfData[index]);
+    this.teacherInfoFormData = JSON.parse(str);
+    this.isShowAddModel = true;
+  }
   handleCancel() {
     this.isShowAddModel = false;
     this.formStatus.type = 'default';

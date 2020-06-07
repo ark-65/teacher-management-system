@@ -49,7 +49,7 @@
         {{data.contact}}
       </td>
       <td>
-        <a class="actionBtn" (click)="isShowAddModel = true">编辑</a>
+        <a class="actionBtn" (click)="editTeacher(data.id)">编辑</a>
         <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.teacherName}}吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
       </td>
     </tr>
@@ -105,11 +105,11 @@
     </div>
     <div nz-row>
       <nz-form-item>
-        <nz-form-label [nzSpan]="6" nzFor="eMail" nzRequired>
+        <nz-form-label [nzSpan]="6" nzFor="email" nzRequired>
           电子邮箱
         </nz-form-label>
         <nz-form-control>
-          <input nz-input [(ngModel)]="teacherInfoFormData.eMail" id="eMail" placeholder="请输入电子邮箱地址" />
+          <input nz-input [(ngModel)]="teacherInfoFormData.email" id="email" placeholder="请输入电子邮箱地址" />
         </nz-form-control>
       </nz-form-item>
     </div>

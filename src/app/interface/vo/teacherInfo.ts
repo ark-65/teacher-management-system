@@ -4,6 +4,6 @@ export interface TeacherInfo {
   jobTitleId?: number;
   jobId?: number;
   teacherName?: string;
-  eMail?: string;
+  email?: string;
   contact?: string;
 }
