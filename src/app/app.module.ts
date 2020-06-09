@@ -23,6 +23,7 @@ import { RapRecordComponent } from './management/rap-record/rap-record.component
 import {DepartmentNamePipe} from './pipes/department-name.pipe';
 import {JobTitleNamePipe} from './pipes/job-title-name.pipe';
 import {JobNamePipe} from './pipes/job-name.pipe';
+import {TeacherNamePipe} from './pipes/teacher-name.pipe';
 
 registerLocaleData(zh);
 
@@ -40,7 +41,8 @@ registerLocaleData(zh);
         RapRecordComponent,
         DepartmentNamePipe,
         JobTitleNamePipe,
-        JobNamePipe
+        JobNamePipe,
+        TeacherNamePipe
     ],
     imports: [
         BrowserModule,

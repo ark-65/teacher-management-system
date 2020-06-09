@@ -1,6 +1,6 @@
 <div nz-row>
   <button nz-button nzType="default" (click)="showAddModal()">
-    <i nz-icon nzType="plus" nzTheme="outline"></i>添加教师
+    <i nz-icon nzType="plus" nzTheme="outline"></i>添加教师教育经历
   </button>
 </div>
 <div class="table-row" nz-row>
@@ -12,69 +12,55 @@
             [nzShowSizeChanger]="true"
             (nzPageIndexChange)="pageIndexChange($event)"
             (nzPageSizeChange)="pageSizeChange($event)"
-            [nzData]="teacherInfoListOfData"
+            [nzData]="EduExperienceListOfData"
   >
     <thead *ngIf="pageInfo.totalElements !== 0">
     <!--    <th>id</th>-->
-    <th>教师编号</th>
+    <th>学校名称</th>
     <th>教师姓名</th>
-    <th>部门</th>
-    <th>职称</th>
-    <th>职务</th>
-    <th>电子邮件</th>
-    <th>联系方式</th>
+    <th>入学时间</th>
+    <th>毕业时间</th>
+    <th>教育程度</th>
+    <th>学位类型</th>
     <th>操作</th>
     </thead>
     <tbody>
     <tr *ngFor="let data of teacherInfoTable.data">
       <td>
-        {{data.id}}
+        {{data.schoolName}}
       </td>
       <td>
-        {{data.teacherName}}
+        {{data.teacherId | teacherNamePipe: teacherList}}
       </td>
       <td>
-        {{data.deptId | departmentNamePipe: departmentList}}
+        {{data.startTime}}
       </td>
       <td>
-        {{data.jobTitleId | jobTitleNamePipe: jobTitleList}}
+        {{data.endTime}}
       </td>
       <td>
-        {{data.jobId | jobNamePipe: jobList}}
+        {{data.education}}
       </td>
       <td>
-        {{data.email}}
+        {{data.eduType}}
       </td>
       <td>
-        {{data.contact}}
-      </td>
-      <td>
-        <a class="actionBtn" (click)="editTeacher(data.id)">编辑</a>
-        <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.teacherName}}吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
+        <a class="actionBtn" (click)="editFamily(data.id)">编辑</a>
+        <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.memberName}}吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
       </td>
     </tr>
     </tbody>
   </nz-table>
   <!--  添加弹框-->
-  <nz-modal [(nzVisible)]="isShowAddModel" nzTitle="添加教师" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isLoading">
+  <nz-modal [(nzVisible)]="isShowAddModel" nzTitle="教师家庭成员" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isLoading">
     <div nz-row>
       <nz-form-item>
         <nz-form-label [nzSpan]="6" nzRequired>
           教师姓名
         </nz-form-label>
         <nz-form-control>
-          <input type="text" nz-input placeholder="请输入教师姓名" [(ngModel)]="teacherInfoFormData.teacherName">
-        </nz-form-control>
-      </nz-form-item>
-    </div>
-    <div nz-row>
-      <nz-form-item>
-        <nz-form-label [nzSpan]="6" nzRequired>
-          部门
-        </nz-form-label>
-        <nz-form-control>
-          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择教师部门" [(ngModel)]="teacherInfoFormData.deptId">
-            <nz-option *ngFor="let item of departmentList" [nzLabel]="item.departmentName" [nzValue]="item.id"></nz-option>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择教师" [(ngModel)]="eduExperienceFormData.teacherId">
+            <nz-option *ngFor="let item of teacherList" [nzLabel]="item.teacherName" [nzValue]="item.id"></nz-option>
           </nz-select>
         </nz-form-control>
       </nz-form-item>
@@ -82,44 +68,50 @@
     <div nz-row>
       <nz-form-item>
         <nz-form-label [nzSpan]="6" nzRequired>
-          职称
+          入学时间
         </nz-form-label>
         <nz-form-control>
-          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择教师职称" [(ngModel)]="teacherInfoFormData.jobTitleId">
-            <nz-option *ngFor="let item of jobTitleList" [nzLabel]="item.jobTitleName" [nzValue]="item.id"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-    </div>
-    <div nz-row>
-      <nz-form-item>
-        <nz-form-label [nzSpan]="6" nzRequired>
-          职务
-        </nz-form-label>
-        <nz-form-control>
-          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择教师职务" [(ngModel)]="teacherInfoFormData.jobId">
-            <nz-option *ngFor="let item of jobList" [nzLabel]="item.jobName" [nzValue]="item.id"></nz-option>
-          </nz-select>
+          <nz-date-picker [(ngModel)]="startTime" (ngModelChange)="onChangeForStartTime($event)"></nz-date-picker>
         </nz-form-control>
       </nz-form-item>
     </div>
     <div nz-row>
       <nz-form-item>
         <nz-form-label [nzSpan]="6" nzFor="email" nzRequired>
-          电子邮箱
+          毕业时间
         </nz-form-label>
         <nz-form-control>
-          <input nz-input [(ngModel)]="teacherInfoFormData.email" id="email" placeholder="请输入电子邮箱地址" />
+          <nz-date-picker [(ngModel)]="endTime" (ngModelChange)="onChangeForEndTime($event)"></nz-date-picker>
         </nz-form-control>
       </nz-form-item>
     </div>
     <div nz-row>
       <nz-form-item>
         <nz-form-label [nzSpan]="6" nzRequired>
-          联系方式
+          学校名称
         </nz-form-label>
         <nz-form-control>
-          <input type="text" nz-input placeholder="请输入教师联系方式" [(ngModel)]="teacherInfoFormData.contact">
+          <input type="text" nz-input placeholder="请输入教该成员联系方式" [(ngModel)]="eduExperienceFormData.schoolName">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          教育程度
+        </nz-form-label>
+        <nz-form-control>
+          <input type="text" nz-input placeholder="请输入教该成员联系方式" [(ngModel)]="eduExperienceFormData.education">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          学位类型
+        </nz-form-label>
+        <nz-form-control>
+          <input type="text" nz-input placeholder="请输入教该成员联系方式" [(ngModel)]="eduExperienceFormData.eduType">
         </nz-form-control>
       </nz-form-item>
     </div>

@@ -3,4 +3,5 @@ export interface RapRecord {
   teacherId: number;
   rapType: string;
   remarks: string;
+  createTime?: string;
 }

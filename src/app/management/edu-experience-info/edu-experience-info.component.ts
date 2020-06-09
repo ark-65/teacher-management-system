@@ -3,9 +3,8 @@ import {ManagementService} from '../management.service';
 import {NzMessageService, NzNotificationService} from 'ng-zorro-antd';
 import {Page} from '../../interface/page';
 import {TeacherInfo} from '../../interface/vo/teacherInfo';
-import {Department} from '../../interface/vo/department';
-import {JobTitle} from '../../interface/vo/jobTitle';
-import {Job} from '../../interface/vo/job';
+import {EduExperienceInfo} from '../../interface/vo/eduExperienceInfo';
+import {format} from 'date-fns';
 
 @Component({
   selector: 'app-edu-experience-info',
@@ -26,54 +25,53 @@ export class EduExperienceInfoComponent implements OnInit {
     totalPages: 0,
     numberOfElements: 0
   };
-  teacherInfoListOfData: TeacherInfo[] = [];
+  EduExperienceListOfData: EduExperienceInfo[] = [];
   isLoading = false;
+  // 开始时间
+  startTime: Date;
+  // 结束时间
+  endTime: Date;
   // 教师信息,用于保存和编辑
-  teacherInfoFormData: TeacherInfo = {
-    teacherName: '',
-    deptId: null,
-    jobId: null,
-    jobTitleId: null,
-    email: '',
-    contact: ''
+  eduExperienceFormData: EduExperienceInfo = {
+    startTime: '',
+    endTime: '',
+    teacherId: null,
+    schoolName: '',
+    education: '',
+    eduType: ''
   };
-  teacherEdit = false;
+  familyEdit = false;
   formStatus = {
     type: 'default',
     errorMsg: ''
   };
-  // 全部部门
-  departmentList: Department[];
-  // 全部职称
-  jobTitleList: JobTitle[];
-  // 全部职务
-  jobList: Job[];
+  // 全部教师
+  teacherList: TeacherInfo[];
   // 添加弹框
   isShowAddModel = false;
   ngOnInit(): void {
     this.getData(this.pageInfo);
 
   }
-
+  // 时间改变时获取
+  onChangeForStartTime(result: Date): void {
+    console.log('onChange: ', result, format(result, 'yyyy-MM-dd'));
+  }
+  onChangeForEndTime(result: Date): void {
+    console.log('onChange: ', result, format(result, 'yyyy-MM-dd'));
+  }
   getData(page: Page): void {
-    this.manageService.getTeacherInfo(page).subscribe(res => {
-      console.log(res);
+    this.manageService.getEduExperience(page).subscribe(res => {
       if (res.code === 0) {
         const data = res.data;
-        this.pageInfo.size = data.teacherPage.size;
-        this.pageInfo.number = data.teacherPage.number;
-        this.pageInfo.totalElements = data.teacherPage.totalElements;
-        this.pageInfo.totalPages = data.teacherPage.totalPages;
-        this.teacherInfoListOfData = data.teacherPage.content;
-        this.pageInfo.numberOfElements = data.teacherPage.numberOfElements;
-        this.departmentList = res.data.department;
-        this.jobTitleList = res.data.jobTitle;
-        this.jobList = res.data.job;
-        this.teacherInfoFormData = {
-          deptId: this.departmentList[0].id,
-          jobTitleId: this.jobTitleList[0].id,
-          jobId: this.jobList[0].id
-        };
+        this.pageInfo.size = data.eduPage.size;
+        this.pageInfo.number = data.eduPage.number;
+        this.pageInfo.totalElements = data.eduPage.totalElements;
+        this.pageInfo.totalPages = data.eduPage.totalPages;
+        this.EduExperienceListOfData = data.eduPage.content;
+        this.pageInfo.numberOfElements = data.eduPage.numberOfElements;
+        this.teacherList = data.teachers;
+        this.eduExperienceFormData.teacherId = this.teacherList[0].id;
       }
     });
   }
@@ -93,15 +91,15 @@ export class EduExperienceInfoComponent implements OnInit {
 
   // 确认删除按钮
   deleteConfirm(id: number): void {
-    this.manageService.deleteTeacherInfo(id).subscribe(res => {
+    this.manageService.deleteEduExperience(id).subscribe(res => {
       if (res.code === 0) {
-        let newTeacherInfoList = [];
-        this.teacherInfoListOfData.forEach(item => {
+        let newEduExperienceInfoList = [];
+        this.EduExperienceListOfData.forEach(item => {
           if (item.id !== id) {
-            newTeacherInfoList = [...newTeacherInfoList, item];
+            newEduExperienceInfoList = [...newEduExperienceInfoList, item];
           }
         });
-        this.teacherInfoListOfData = newTeacherInfoList;
+        this.EduExperienceListOfData = newEduExperienceInfoList;
         // 如果当前页删除的是最后一条数据,返回上一页
         if (this.pageInfo.numberOfElements === 1) {
           this.pageIndexChange(this.pageInfo.number - 1);
@@ -124,82 +122,69 @@ export class EduExperienceInfoComponent implements OnInit {
   }
   // 确认提交
   handleOk() {
-    // 邮箱正则
-    const emailReg = /^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/;
-    // 手机号正则
-    const phoneReg = /^1[3-9]\d{9}$/;
-    if (this.teacherInfoFormData.teacherName === '') {
+    if (this.eduExperienceFormData.teacherId === null) {
       this.notification.create(
         'error',
-        '添加失败',
+        '失败',
         '教师姓名不能为空'
       );
       return;
     }
-    if (this.teacherInfoFormData.deptId === null) {
+    if (this.startTime === null) {
       this.notification.create(
         'error',
-        '添加失败',
-        '请选择该教师所属部门'
+        '失败',
+        '学校入学时间不能为空'
+      );
+      return;
+    } else {
+      this.eduExperienceFormData.startTime = format(this.startTime, 'yyyy-MM-dd');
+    }
+    if (this.endTime === null) {
+      this.notification.create(
+        'error',
+        '失败',
+        '学校毕业时间不能为空'
+      );
+      return;
+    } else {
+      this.eduExperienceFormData.endTime = format(this.endTime, 'yyyy-MM-dd');
+    }
+    if (this.eduExperienceFormData.schoolName === '') {
+      this.notification.create(
+        'error',
+        '失败',
+        '学校名称不能为空'
       );
       return;
     }
-    if (this.teacherInfoFormData.jobTitleId === null) {
+    if (this.eduExperienceFormData.education === '') {
       this.notification.create(
         'error',
-        '添加失败',
-        '请选择该教师职称'
+        '失败',
+        '教育学历不能为空'
       );
       return;
     }
-    if (this.teacherInfoFormData.jobId === null) {
+    if (this.eduExperienceFormData.eduType === '') {
       this.notification.create(
         'error',
-        '添加失败',
-        '请选择该教师职务'
+        '失败',
+        '学历类型不能为空'
       );
       return;
     }
-    if (this.teacherInfoFormData.email === '') {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '电子邮箱不能为空'
-      );
-      return;
-    } else if (!emailReg.test(this.teacherInfoFormData.email)) {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '电子邮箱格式不正确'
-      );
-      return;
-    }
-    if (this.teacherInfoFormData.contact === '') {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '联系方式(手机号)不能为空'
-      );
-      return;
-    } else if (!phoneReg.test(this.teacherInfoFormData.contact)) {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '请输入正确的手机号'
-      );
-      return;
-    }
+    console.log(this.eduExperienceFormData);
     this.isLoading = true;
-    this.teacherEdit = false;
-    if (this.teacherEdit) {
+    this.familyEdit = false;
+    if (this.familyEdit) {
       this.updateTeacher();
     } else {
-      this.addTeacher();
+      this.addFamily();
     }
   }
-  addTeacher() {
-    this.manageService.addTeacherInfo(this.teacherInfoFormData).subscribe(res => {
+  addFamily() {
+    this.manageService.addEduExperience(this.eduExperienceFormData).subscribe(res => {
       this.isLoading = false;
       if (res.code === 0) {
         this.notification.create(
@@ -208,13 +193,13 @@ export class EduExperienceInfoComponent implements OnInit {
           '添加成功'
         );
         this.isShowAddModel = false;
-        this.teacherInfoFormData = {
-          deptId: this.departmentList[0].id,
-          jobTitleId: this.jobTitleList[0].id,
-          jobId: this.jobList[0].id,
-          teacherName: '',
-          email: '',
-          contact: ''
+        this.eduExperienceFormData = {
+          startTime: '',
+          endTime: '',
+          schoolName: '',
+          education: '',
+          eduType: '',
+          teacherId: this.teacherList[0].id
         };
         this.getData(this.pageInfo);
       } else {
@@ -228,7 +213,7 @@ export class EduExperienceInfoComponent implements OnInit {
   }
 
   updateTeacher() {
-    this.manageService.updateTeacherInfo(this.teacherInfoFormData).subscribe(res => {
+    this.manageService.updateEduExperience(this.eduExperienceFormData).subscribe(res => {
       this.isLoading = false;
       if (res.code === 0) {
         this.notification.create(
@@ -237,13 +222,13 @@ export class EduExperienceInfoComponent implements OnInit {
           '修改成功'
         );
         this.isShowAddModel = false;
-        this.teacherInfoFormData = {
-          deptId: this.departmentList[0].id,
-          jobTitleId: this.jobTitleList[0].id,
-          jobId: this.jobList[0].id,
-          teacherName: '',
-          email: '',
-          contact: ''
+        this.eduExperienceFormData = {
+          startTime: '',
+          endTime: '',
+          schoolName: '',
+          education: '',
+          eduType: '',
+          teacherId: this.teacherList[0].id
         };
         this.getData(this.pageInfo);
       } else {
@@ -255,14 +240,14 @@ export class EduExperienceInfoComponent implements OnInit {
       }
     });
   }
-  editTeacher(id: number) {
-    this.teacherEdit = true;
-    const index = this.teacherInfoListOfData.findIndex(item => item.id === id);
+  editFamily(id: number) {
+    this.familyEdit = true;
+    const index = this.EduExperienceListOfData.findIndex(item => item.id === id);
     console.log(index);
-    console.log(this.teacherInfoListOfData[index]);
+    console.log(this.EduExperienceListOfData[index]);
     // 取消双向数据绑定
-    const str = JSON.stringify(this.teacherInfoListOfData[index]);
-    this.teacherInfoFormData = JSON.parse(str);
+    const str = JSON.stringify(this.EduExperienceListOfData[index]);
+    this.eduExperienceFormData = JSON.parse(str);
     this.isShowAddModel = true;
   }
   handleCancel() {

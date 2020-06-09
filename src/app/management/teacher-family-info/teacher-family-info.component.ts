@@ -2,10 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {ManagementService} from '../management.service';
 import {NzMessageService, NzNotificationService} from 'ng-zorro-antd';
 import {Page} from '../../interface/page';
+import {TeacherFamilyMember} from '../../interface/vo/teacherFamilyMember';
 import {TeacherInfo} from '../../interface/vo/teacherInfo';
-import {Department} from '../../interface/vo/department';
-import {JobTitle} from '../../interface/vo/jobTitle';
-import {Job} from '../../interface/vo/job';
 
 @Component({
   selector: 'app-teacher-family-info',
@@ -26,28 +24,22 @@ export class TeacherFamilyInfoComponent implements OnInit {
     totalPages: 0,
     numberOfElements: 0
   };
-  teacherInfoListOfData: TeacherInfo[] = [];
+  teacherFamilyListOfData: TeacherFamilyMember[] = [];
   isLoading = false;
   // 教师信息,用于保存和编辑
-  teacherInfoFormData: TeacherInfo = {
-    teacherName: '',
-    deptId: null,
-    jobId: null,
-    jobTitleId: null,
-    email: '',
+  teacherFamilyFormData: TeacherFamilyMember = {
+    relationship: '',
+    teacherId: null,
+    memberName: '',
     contact: ''
   };
-  teacherEdit = false;
+  familyEdit = false;
   formStatus = {
     type: 'default',
     errorMsg: ''
   };
-  // 全部部门
-  departmentList: Department[];
-  // 全部职称
-  jobTitleList: JobTitle[];
-  // 全部职务
-  jobList: Job[];
+  // 全部教师
+  teacherList: TeacherInfo[];
   // 添加弹框
   isShowAddModel = false;
   ngOnInit(): void {
@@ -56,24 +48,19 @@ export class TeacherFamilyInfoComponent implements OnInit {
   }
 
   getData(page: Page): void {
-    this.manageService.getTeacherInfo(page).subscribe(res => {
+    this.manageService.getTeacherFamily(page).subscribe(res => {
       console.log(res);
       if (res.code === 0) {
         const data = res.data;
-        this.pageInfo.size = data.teacherPage.size;
-        this.pageInfo.number = data.teacherPage.number;
-        this.pageInfo.totalElements = data.teacherPage.totalElements;
-        this.pageInfo.totalPages = data.teacherPage.totalPages;
-        this.teacherInfoListOfData = data.teacherPage.content;
-        this.pageInfo.numberOfElements = data.teacherPage.numberOfElements;
-        this.departmentList = res.data.department;
-        this.jobTitleList = res.data.jobTitle;
-        this.jobList = res.data.job;
-        this.teacherInfoFormData = {
-          deptId: this.departmentList[0].id,
-          jobTitleId: this.jobTitleList[0].id,
-          jobId: this.jobList[0].id
-        };
+        console.log(res);
+        this.pageInfo.size = data.familyPage.size;
+        this.pageInfo.number = data.familyPage.number;
+        this.pageInfo.totalElements = data.familyPage.totalElements;
+        this.pageInfo.totalPages = data.familyPage.totalPages;
+        this.teacherFamilyListOfData = data.familyPage.content;
+        this.pageInfo.numberOfElements = data.familyPage.numberOfElements;
+        this.teacherList = data.teachers;
+        this.teacherFamilyFormData.teacherId = this.teacherList[0].id;
       }
     });
   }
@@ -93,15 +80,15 @@ export class TeacherFamilyInfoComponent implements OnInit {
 
   // 确认删除按钮
   deleteConfirm(id: number): void {
-    this.manageService.deleteTeacherInfo(id).subscribe(res => {
+    this.manageService.deleteTeacherFamily(id).subscribe(res => {
       if (res.code === 0) {
-        let newTeacherInfoList = [];
-        this.teacherInfoListOfData.forEach(item => {
+        let newTeacherFamilyMemberList = [];
+        this.teacherFamilyListOfData.forEach(item => {
           if (item.id !== id) {
-            newTeacherInfoList = [...newTeacherInfoList, item];
+            newTeacherFamilyMemberList = [...newTeacherFamilyMemberList, item];
           }
         });
-        this.teacherInfoListOfData = newTeacherInfoList;
+        this.teacherFamilyListOfData = newTeacherFamilyMemberList;
         // 如果当前页删除的是最后一条数据,返回上一页
         if (this.pageInfo.numberOfElements === 1) {
           this.pageIndexChange(this.pageInfo.number - 1);
@@ -124,82 +111,57 @@ export class TeacherFamilyInfoComponent implements OnInit {
   }
   // 确认提交
   handleOk() {
-    // 邮箱正则
-    const emailReg = /^\w+((.\w+)|(-\w+))@[A-Za-z0-9]+((.|-)[A-Za-z0-9]+).[A-Za-z0-9]+$/;
     // 手机号正则
     const phoneReg = /^1[3-9]\d{9}$/;
-    if (this.teacherInfoFormData.teacherName === '') {
+    if (this.teacherFamilyFormData.teacherId === null) {
       this.notification.create(
         'error',
-        '添加失败',
+        '失败',
         '教师姓名不能为空'
       );
       return;
     }
-    if (this.teacherInfoFormData.deptId === null) {
+    if (this.teacherFamilyFormData.relationship === '') {
+        this.notification.create(
+          'error',
+          '失败',
+          '与教师关系不能为空'
+        );
+        return;
+    }
+    if (this.teacherFamilyFormData.memberName === '') {
       this.notification.create(
         'error',
-        '添加失败',
-        '请选择该教师所属部门'
+        '失败',
+        '家庭成员姓名不能为空'
       );
       return;
     }
-    if (this.teacherInfoFormData.jobTitleId === null) {
+    if (this.teacherFamilyFormData.contact === '') {
       this.notification.create(
         'error',
-        '添加失败',
-        '请选择该教师职称'
-      );
-      return;
-    }
-    if (this.teacherInfoFormData.jobId === null) {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '请选择该教师职务'
-      );
-      return;
-    }
-    if (this.teacherInfoFormData.email === '') {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '电子邮箱不能为空'
-      );
-      return;
-    } else if (!emailReg.test(this.teacherInfoFormData.email)) {
-      this.notification.create(
-        'error',
-        '添加失败',
-        '电子邮箱格式不正确'
-      );
-      return;
-    }
-    if (this.teacherInfoFormData.contact === '') {
-      this.notification.create(
-        'error',
-        '添加失败',
+        '失败',
         '联系方式(手机号)不能为空'
       );
       return;
-    } else if (!phoneReg.test(this.teacherInfoFormData.contact)) {
+    } else if (!phoneReg.test(this.teacherFamilyFormData.contact)) {
       this.notification.create(
         'error',
-        '添加失败',
+        '失败',
         '请输入正确的手机号'
       );
       return;
     }
     this.isLoading = true;
-    this.teacherEdit = false;
-    if (this.teacherEdit) {
+    this.familyEdit = false;
+    if (this.familyEdit) {
       this.updateTeacher();
     } else {
-      this.addTeacher();
+      this.addFamily();
     }
   }
-  addTeacher() {
-    this.manageService.addTeacherInfo(this.teacherInfoFormData).subscribe(res => {
+  addFamily() {
+    this.manageService.addTeacherFamily(this.teacherFamilyFormData).subscribe(res => {
       this.isLoading = false;
       if (res.code === 0) {
         this.notification.create(
@@ -208,12 +170,10 @@ export class TeacherFamilyInfoComponent implements OnInit {
           '添加成功'
         );
         this.isShowAddModel = false;
-        this.teacherInfoFormData = {
-          deptId: this.departmentList[0].id,
-          jobTitleId: this.jobTitleList[0].id,
-          jobId: this.jobList[0].id,
-          teacherName: '',
-          email: '',
+        this.teacherFamilyFormData = {
+          memberName: '',
+          relationship: '',
+          teacherId: this.teacherList[0].id,
           contact: ''
         };
         this.getData(this.pageInfo);
@@ -228,7 +188,7 @@ export class TeacherFamilyInfoComponent implements OnInit {
   }
 
   updateTeacher() {
-    this.manageService.updateTeacherInfo(this.teacherInfoFormData).subscribe(res => {
+    this.manageService.updateTeacherFamily(this.teacherFamilyFormData).subscribe(res => {
       this.isLoading = false;
       if (res.code === 0) {
         this.notification.create(
@@ -237,12 +197,10 @@ export class TeacherFamilyInfoComponent implements OnInit {
           '修改成功'
         );
         this.isShowAddModel = false;
-        this.teacherInfoFormData = {
-          deptId: this.departmentList[0].id,
-          jobTitleId: this.jobTitleList[0].id,
-          jobId: this.jobList[0].id,
-          teacherName: '',
-          email: '',
+        this.teacherFamilyFormData = {
+          memberName: '',
+          relationship: '',
+          teacherId: this.teacherList[0].id,
           contact: ''
         };
         this.getData(this.pageInfo);
@@ -255,14 +213,14 @@ export class TeacherFamilyInfoComponent implements OnInit {
       }
     });
   }
-  editTeacher(id: number) {
-    this.teacherEdit = true;
-    const index = this.teacherInfoListOfData.findIndex(item => item.id === id);
+  editFamily(id: number) {
+    this.familyEdit = true;
+    const index = this.teacherFamilyListOfData.findIndex(item => item.id === id);
     console.log(index);
-    console.log(this.teacherInfoListOfData[index]);
+    console.log(this.teacherFamilyListOfData[index]);
     // 取消双向数据绑定
-    const str = JSON.stringify(this.teacherInfoListOfData[index]);
-    this.teacherInfoFormData = JSON.parse(str);
+    const str = JSON.stringify(this.teacherFamilyListOfData[index]);
+    this.teacherFamilyFormData = JSON.parse(str);
     this.isShowAddModel = true;
   }
   handleCancel() {
