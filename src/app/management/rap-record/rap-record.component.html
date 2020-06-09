@@ -1,1 +1,83 @@
-<p>rap-record works!</p>
+<div nz-row>
+  <button nz-button nzType="default" (click)="showAddModal()">
+    <i nz-icon nzType="plus" nzTheme="outline"></i>添加奖惩
+  </button>
+</div>
+<div class="table-row" nz-row>
+  <nz-table #teacherInfoTable
+            [nzFrontPagination]="false"
+            [nzTotal]="pageInfo.totalElements"
+            [nzPageSize]="pageInfo.size"
+            [nzPageSizeOptions]="[5,10,15]"
+            [nzShowSizeChanger]="true"
+            (nzPageIndexChange)="pageIndexChange($event)"
+            (nzPageSizeChange)="pageSizeChange($event)"
+            [nzData]="rapRecordListOfData"
+  >
+    <thead *ngIf="pageInfo.totalElements !== 0">
+    <!--    <th>id</th>-->
+    <th>教师姓名</th>
+    <th>奖惩类型</th>
+    <th>创建时间</th>
+    <th>奖惩备注</th>
+    <th>操作</th>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of teacherInfoTable.data">
+      <td>
+        {{data.teacherId | teacherNamePipe: teacherList}}
+      </td>
+      <td>
+        {{data.rapType}}
+      </td>
+      <td>
+        {{data.createTime}}
+      </td>
+      <td>
+        {{data.remarks}}
+      </td>
+      <td>
+        <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.teacherId | teacherNamePipe: teacherList}}的{{data.rapType}}记录吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
+      </td>
+    </tr>
+    </tbody>
+  </nz-table>
+  <!--  添加弹框-->
+  <nz-modal [(nzVisible)]="isShowAddModel" nzTitle="教师家庭成员" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isLoading">
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          教师姓名
+        </nz-form-label>
+        <nz-form-control>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择教师" [(ngModel)]="rapRecordFormData.teacherId">
+            <nz-option *ngFor="let item of teacherList" [nzLabel]="item.teacherName" [nzValue]="item.id"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          成员姓名
+        </nz-form-label>
+        <nz-form-control>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择奖惩类型" [(ngModel)]="rapRecordFormData.rapType">
+            <nz-option nzLabel="奖励" nzValue="奖励"></nz-option>
+            <nz-option nzLabel="惩罚" nzValue="惩罚"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="email" nzRequired>
+          奖惩备注
+        </nz-form-label>
+        <nz-form-control>
+          <textarea nz-input [(ngModel)]="rapRecordFormData.remarks" id="email" placeholder="请输入与教师的关系"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </nz-modal>
+</div>

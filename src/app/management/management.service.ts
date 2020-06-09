@@ -11,6 +11,10 @@ import {TeacherInfo} from '../interface/vo/teacherInfo';
 import {RapRecord} from '../interface/vo/rapRecord';
 import {EduExperienceInfo} from '../interface/vo/eduExperienceInfo';
 import {TeacherFamilyMember} from '../interface/vo/teacherFamilyMember';
+import {TeacherPageVo} from '../interface/vo/teacherPageVo';
+import {EduExperiencePageVo} from '../interface/vo/eduExperiencePageVo';
+import {FamilyPageVo} from '../interface/vo/familyPageVo';
+import {RapRecordPageVo} from '../interface/vo/rapRecordPageVo';
 
 @Injectable({
   providedIn: 'root'
@@ -89,10 +93,10 @@ export class ManagementService {
   updateTeacherInfo(teacherInfo: TeacherInfo): Observable<DataVo> {
     return this.http.patch<DataVo>(`${this.api}/teacher-info`, teacherInfo);
   }
-  getTeacherInfo(page: Page): Observable<PageDataVo> {
+  getTeacherInfo(page: Page): Observable<TeacherPageVo> {
     const pageNumber = page.number;
     const pageSize = page.size;
-    return this.http.get<PageDataVo>(`${this.api}/teacher-info?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
+    return this.http.get<TeacherPageVo>(`${this.api}/teacher-info?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
   }
 
   /**
@@ -107,10 +111,10 @@ export class ManagementService {
   updateTeacherFamily(teacherFamilyMember: TeacherFamilyMember): Observable<DataVo> {
     return this.http.patch<DataVo>(`${this.api}/teacher-family`, teacherFamilyMember);
   }
-  getTeacherFamily(page: Page): Observable<PageDataVo> {
+  getTeacherFamily(page: Page): Observable<FamilyPageVo> {
     const pageNumber = page.number;
     const pageSize = page.size;
-    return this.http.get<PageDataVo>(`${this.api}/teacher-family?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
+    return this.http.get<FamilyPageVo>(`${this.api}/teacher-family?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
   }
   /**
    * 教师教育经历管理
@@ -124,10 +128,10 @@ export class ManagementService {
   updateEduExperience(eduExperienceInfo: EduExperienceInfo): Observable<DataVo> {
     return this.http.patch<DataVo>(`${this.api}/edu-experience`, eduExperienceInfo);
   }
-  getEduExperience(page: Page): Observable<PageDataVo> {
+  getEduExperience(page: Page): Observable<EduExperiencePageVo> {
     const pageNumber = page.number;
     const pageSize = page.size;
-    return this.http.get<PageDataVo>(`${this.api}/edu-experience?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
+    return this.http.get<EduExperiencePageVo>(`${this.api}/edu-experience?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
   }
   /**
    * 教师奖惩管理
@@ -141,9 +145,9 @@ export class ManagementService {
   updateRapRecord(rapRecord: RapRecord): Observable<DataVo> {
     return this.http.patch<DataVo>(`${this.api}/rap-record`, rapRecord);
   }
-  getRapRecord(page: Page): Observable<PageDataVo> {
+  getRapRecord(page: Page): Observable<RapRecordPageVo> {
     const pageNumber = page.number;
     const pageSize = page.size;
-    return this.http.get<PageDataVo>(`${this.api}/rap-record?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
+    return this.http.get<RapRecordPageVo>(`${this.api}/rap-record?page=${pageNumber}&size=${pageSize}&sort=id,asc`);
   }
 }

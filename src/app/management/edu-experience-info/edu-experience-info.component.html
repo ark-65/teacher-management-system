@@ -1,1 +1,127 @@
-<p>edu-experience-info works!</p>
+<div nz-row>
+  <button nz-button nzType="default" (click)="showAddModal()">
+    <i nz-icon nzType="plus" nzTheme="outline"></i>添加教师教育经历
+  </button>
+</div>
+<div class="table-row" nz-row>
+  <nz-table #teacherInfoTable
+            [nzFrontPagination]="false"
+            [nzTotal]="pageInfo.totalElements"
+            [nzPageSize]="pageInfo.size"
+            [nzPageSizeOptions]="[5,10,15]"
+            [nzShowSizeChanger]="true"
+            (nzPageIndexChange)="pageIndexChange($event)"
+            (nzPageSizeChange)="pageSizeChange($event)"
+            [nzData]="EduExperienceListOfData"
+  >
+    <thead *ngIf="pageInfo.totalElements !== 0">
+    <!--    <th>id</th>-->
+    <th>学校名称</th>
+    <th>教师姓名</th>
+    <th>入学时间</th>
+    <th>毕业时间</th>
+    <th>教育程度</th>
+    <th>学位类型</th>
+    <th>操作</th>
+    </thead>
+    <tbody>
+    <tr *ngFor="let data of teacherInfoTable.data">
+      <td>
+        {{data.schoolName}}
+      </td>
+      <td>
+        {{data.teacherId | teacherNamePipe: teacherList}}
+      </td>
+      <td>
+        {{data.startTime}}
+      </td>
+      <td>
+        {{data.endTime}}
+      </td>
+      <td>
+        {{data.education}}
+      </td>
+      <td>
+        {{data.eduType}}
+      </td>
+      <td>
+        <a class="actionBtn" (click)="editFamily(data.id)">编辑</a>
+        <a nz-popconfirm class="activeBtn"  nzTitle="确定要删除{{data.memberName}}吗?" (nzOnConfirm)="deleteConfirm(data.id)" >删除</a>
+      </td>
+    </tr>
+    </tbody>
+  </nz-table>
+  <!--  添加弹框-->
+  <nz-modal [(nzVisible)]="isShowAddModel" nzTitle="教师家庭成员" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()" [nzOkLoading]="isLoading">
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          教师姓名
+        </nz-form-label>
+        <nz-form-control>
+          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="请选择教师" [(ngModel)]="eduExperienceFormData.teacherId">
+            <nz-option *ngFor="let item of teacherList" [nzLabel]="item.teacherName" [nzValue]="item.id"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          入学时间
+        </nz-form-label>
+        <nz-form-control>
+          <nz-date-picker [(ngModel)]="startTime" (ngModelChange)="onChangeForStartTime($event)"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzFor="email" nzRequired>
+          毕业时间
+        </nz-form-label>
+        <nz-form-control>
+          <nz-date-picker [(ngModel)]="endTime" (ngModelChange)="onChangeForEndTime($event)"></nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          学校名称
+        </nz-form-label>
+        <nz-form-control>
+          <input type="text" nz-input placeholder="请输入教该成员联系方式" [(ngModel)]="eduExperienceFormData.schoolName">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          教育程度
+        </nz-form-label>
+        <nz-form-control>
+          <input type="text" nz-input placeholder="请输入教该成员联系方式" [(ngModel)]="eduExperienceFormData.education">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-row>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>
+          学位类型
+        </nz-form-label>
+        <nz-form-control>
+          <input type="text" nz-input placeholder="请输入教该成员联系方式" [(ngModel)]="eduExperienceFormData.eduType">
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <!--      <nz-form-item class="add-form">-->
+    <!--        <nz-form-label [nzSpan]="6">部门名称</nz-form-label>-->
+    <!--        <nz-form-control [nzValidateStatus]="formStatus.type" [nzSpan]="12" [nzErrorTip]="formStatus.errorMsg">-->
+    <!--          <input type="text" nz-input placeholder="请输入部门名称" [(ngModel)]="departmentFormData.departmentName">-->
+    <!--        </nz-form-control>-->
+    <!--      </nz-form-item>-->
+    <!--      </form>-->
+  </nz-modal>
+</div>
